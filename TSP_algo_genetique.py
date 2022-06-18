@@ -4,7 +4,8 @@ import random
 
 from datetime import datetime
 # Parameters
-n_cities = 20
+NOMBRE_DE_VILLES = 10
+MAX_DISTANCE = 2000
 n_population = 100
 mutation_rate = 0.3
 
@@ -18,19 +19,28 @@ def compute_city_distance_names(city_a, city_b, cities_dict):
     return compute_city_distance_coordinates(cities_dict[city_a], cities_dict[city_b])
 
 
-def genesis(city_list, n_population):
+def generateDistances():
+    distances = np.zeros((NOMBRE_DE_VILLES, NOMBRE_DE_VILLES))
+    for ville in range(NOMBRE_DE_VILLES):
+        villes = [i for i in range(NOMBRE_DE_VILLES) if not i == ville]
+        for vers_la_ville in villes:
+            distances[ville][vers_la_ville] = random.randint(50, MAX_DISTANCE)
+            distances[vers_la_ville][ville] = distances[ville][vers_la_ville]
+    print('voici la matrice des distances entres les villes \n', distances)
+    return distances
 
+def genesis(city_list, n_population):
     population_set = []
     for i in range(n_population):
         #Randomly generating a new solution
-        sol_i = city_list[np.random.choice(list(range(n_cities)), n_cities, replace=False)]
+        sol_i = city_list[np.random.choice(list(range(NOMBRE_DE_VILLES)), NOMBRE_DE_VILLES, replace=False)]
         population_set.append(sol_i)
     return np.array(population_set)
 
 
 def fitness_eval(city_list, cities_dict):
     total = 0
-    for i in range(n_cities-1):
+    for i in range(NOMBRE_DE_VILLES-1):
         a = city_list[i]
         b = city_list[i+1]
         total += compute_city_distance_names(a,b, cities_dict)
@@ -42,6 +52,23 @@ def get_all_fitnes(population_set, cities_dict):
     #Looping over all solutions computing the fitness for each solution
     for i in  range(n_population):
         fitnes_list[i] = fitness_eval(population_set[i], cities_dict)
+    return fitnes_list
+
+
+def get_fitness(city_list, distance_list):
+    total = 0
+    for i in range(NOMBRE_DE_VILLES-1):
+        a = city_list[i]
+        b = city_list[i+1]
+        total += distance_list[a][b]
+    return total
+
+
+def get_all_fitness(population_set, distance_list):
+    fitnes_list = np.zeros(n_population)
+    #Looping over all solutions computing the fitness for each solution
+    for i in  range(n_population):
+        fitnes_list[i] = get_fitness(population_set[i], distance_list)
     return fitnes_list
 
 
@@ -75,9 +102,9 @@ def mate_population(progenitor_list):
 
 
 def mutate_offspring(offspring):
-    for q in range(int(n_cities * mutation_rate)):
-        a = np.random.randint(0, n_cities)
-        b = np.random.randint(0, n_cities)
+    for q in range(int(NOMBRE_DE_VILLES * mutation_rate)):
+        a = np.random.randint(0, NOMBRE_DE_VILLES)
+        b = np.random.randint(0, NOMBRE_DE_VILLES)
 
         offspring[a], offspring[b] = offspring[b], offspring[a]
 
@@ -92,28 +119,30 @@ def mutate_population(new_population_set):
 
 
 def main():
-    # Generating a list of coordenades representing each city
-    coordinates_list = [[x, y] for x, y in
-                        zip(np.random.randint(0, 100, n_cities), np.random.randint(0, 100, n_cities))]
-    names_list = np.array(
-        ['Berlin', 'London', 'Moscow', 'Barcelona', 'Rome', 'Paris', 'Vienna', 'Munich', 'Istanbul', 'Kyiv',
-         'Bucharest', 'Minsk', 'Warsaw', 'Budapest', 'Milan', 'Prague', 'Sofia', 'Birmingham', 'Brussels', 'Amsterdam'])
-    cities_dict = {x: y for x, y in zip(names_list, coordinates_list)}
+    distances_list = generateDistances()
 
-    population_set = genesis(names_list, n_population)
+    cities_names = np.array([i for i in range(NOMBRE_DE_VILLES)])
+    print('voici la liste des villes \n', cities_names)
 
-    fitnes_list = get_all_fitnes(population_set, cities_dict)
+    population_set = genesis(cities_names, n_population)
+    print('voici la population initiale \n', population_set)
 
-    progenitor_list = progenitor_selection(population_set, fitnes_list)
+    fitness_list = get_all_fitness(population_set, distances_list)
+    print('voici la liste des fitness \n', fitness_list)
+
+    progenitor_list = progenitor_selection(population_set, fitness_list)
+    # print('voici la liste des progeniteurs \n', progenitor_list[0])
 
     new_population_set = mate_population(progenitor_list)
+    print('voici la liste des enfants \n', new_population_set)
 
     mutated_pop = mutate_population(new_population_set)
+    print('voici la liste des enfants mutés \n', mutated_pop)
 
     best_solution = [-1, np.inf, np.array([])]
     for i in range(10000):
         # if i % 100 == 0: print(i, fitnes_list.min(), fitnes_list.mean(), datetime.now().strftime("%d/%m/%y %H:%M"))
-        fitnes_list = get_all_fitnes(mutated_pop, cities_dict)
+        fitnes_list = get_all_fitness(mutated_pop, distances_list)
 
         # Saving the best solution
         if fitnes_list.min() < best_solution[1]:
@@ -126,7 +155,7 @@ def main():
 
         mutated_pop = mutate_population(new_population_set)
 
-    print(best_solution)
+    print("voici la solution final :",best_solution)
 
 
 if __name__ == '__main__':
