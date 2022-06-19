@@ -19,7 +19,7 @@ def compute_city_distance_names(city_a, city_b, cities_dict):
     return compute_city_distance_coordinates(cities_dict[city_a], cities_dict[city_b])
 
 
-def generateDistances():
+def generate_distances():
     distances = np.zeros((NOMBRE_DE_VILLES, NOMBRE_DE_VILLES))
     for ville in range(NOMBRE_DE_VILLES):
         villes = [i for i in range(NOMBRE_DE_VILLES) if not i == ville]
@@ -29,6 +29,7 @@ def generateDistances():
     print('voici la matrice des distances entres les villes \n', distances)
     return distances
 
+
 def genesis(city_list, n_population):
     population_set = []
     for i in range(n_population):
@@ -36,23 +37,6 @@ def genesis(city_list, n_population):
         sol_i = city_list[np.random.choice(list(range(NOMBRE_DE_VILLES)), NOMBRE_DE_VILLES, replace=False)]
         population_set.append(sol_i)
     return np.array(population_set)
-
-
-def fitness_eval(city_list, cities_dict):
-    total = 0
-    for i in range(NOMBRE_DE_VILLES-1):
-        a = city_list[i]
-        b = city_list[i+1]
-        total += compute_city_distance_names(a,b, cities_dict)
-    return total
-
-
-def get_all_fitnes(population_set, cities_dict):
-    fitnes_list = np.zeros(n_population)
-    #Looping over all solutions computing the fitness for each solution
-    for i in  range(n_population):
-        fitnes_list[i] = fitness_eval(population_set[i], cities_dict)
-    return fitnes_list
 
 
 def get_fitness(city_list, distance_list):
@@ -119,7 +103,7 @@ def mutate_population(new_population_set):
 
 
 def main():
-    distances_list = generateDistances()
+    distances_list = generate_distances()
 
     cities_names = np.array([i for i in range(NOMBRE_DE_VILLES)])
     print('voici la liste des villes \n', cities_names)
