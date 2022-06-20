@@ -1,6 +1,9 @@
 # Imports
+import json
+
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 from datetime import datetime
 
@@ -28,8 +31,13 @@ def generate_distances():
         for vers_la_ville in villes:
             distances[ville][vers_la_ville] = random.randint(50, MAX_DISTANCE)
             distances[vers_la_ville][ville] = distances[ville][vers_la_ville]
-    print('voici la matrice des distances entres les villes \n', distances)
     return distances
+
+
+def import_data():
+    with open("data.json", "r") as f:
+        distances = json.load(f)
+    return np.array(distances)
 
 
 def genesis(city_list, n_population):
@@ -107,7 +115,9 @@ def mutate_population(new_population_set):
 
 
 def main():
-    distances_list = generate_distances()
+    distances_list = import_data()
+
+    print('voici la matrice des distances entres les villes \n', distances_list)
 
     cities_names = np.array([i for i in range(NOMBRE_DE_VILLES)])
     print('voici la liste des villes \n', cities_names)
@@ -128,6 +138,7 @@ def main():
     print('voici la liste des enfants mutés \n', mutated_pop)
 
     best_solution = [-1, np.inf, np.array([])]
+    historique_cout = []
     for i in range(NB_GENERATION):
         # if i % 100 == 0: print(i, fitnes_list.min(), fitnes_list.mean(), datetime.now().strftime("%d/%m/%y %H:%M"))
         fitnes_list = get_all_fitness(mutated_pop, distances_list)
@@ -137,13 +148,20 @@ def main():
             best_solution[0] = i
             best_solution[1] = fitnes_list.min()
             best_solution[2] = np.array(mutated_pop)[fitnes_list.min() == fitnes_list]
-
+        historique_cout.append(best_solution[1])
         progenitor_list = progenitor_selection(population_set, fitnes_list)
         new_population_set = mate_population(progenitor_list)
 
         mutated_pop = mutate_population(new_population_set)
 
     print("voici la solution final :", best_solution)
+
+    plt.plot(list(range(NB_GENERATION)), historique_cout, label='Valeur maximale')
+    plt.legend()
+    plt.title('Evolution du coût à travers les générations')
+    plt.xlabel('Nbr de générations')
+    plt.ylabel('Coût')
+    plt.show()
 
 
 if __name__ == '__main__':

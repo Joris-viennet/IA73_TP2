@@ -7,6 +7,7 @@ Ceci est un script temporaire.
 
 # Résolution du problème du voyageur de commerce ou TCS à l'aide du recuit simulé
 # import de la librairie
+import json
 import random
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,13 +15,33 @@ import matplotlib.pyplot as plt
 # Données du problème (générées aléatoirement)
 NOMBRE_DE_VILLES = 10
 NB_GENERATION = 100
-distances = np.zeros((NOMBRE_DE_VILLES, NOMBRE_DE_VILLES))
 MAX_DISTANCE = 2000
-for ville in range(NOMBRE_DE_VILLES):
-    villes = [i for i in range(NOMBRE_DE_VILLES) if not i == ville]
-    for vers_la_ville in villes:
-        distances[ville][vers_la_ville] = random.randint(50, MAX_DISTANCE)
-        distances[vers_la_ville][ville] = distances[ville][vers_la_ville]
+
+
+def generate_distances():
+    distances = np.zeros((NOMBRE_DE_VILLES, NOMBRE_DE_VILLES))
+    for ville in range(NOMBRE_DE_VILLES):
+        villes = [i for i in range(NOMBRE_DE_VILLES) if not i == ville]
+        for vers_la_ville in villes:
+            distances[ville][vers_la_ville] = random.randint(50, MAX_DISTANCE)
+            distances[vers_la_ville][ville] = distances[ville][vers_la_ville]
+    return distances
+
+
+def export_data(distances):
+    with open("data.json", "w") as f:
+        json.dump(distances.tolist(), f)
+
+
+def import_data():
+    with open("data.json", "r") as f:
+        distances = json.load(f)
+    return np.array(distances)
+
+
+distances = generate_distances()
+export_data(distances)
+distances = import_data()
 print('voici la matrice des distances entres les villes \n', distances)
 
 
