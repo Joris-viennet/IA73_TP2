@@ -3,6 +3,7 @@ import numpy as np
 import random
 
 from datetime import datetime
+
 # Parameters
 NOMBRE_DE_VILLES = 10
 MAX_DISTANCE = 2000
@@ -12,8 +13,8 @@ NB_GENERATION = 100
 
 
 # Function to compute the distance between two points
-def compute_city_distance_coordinates(a,b):
-    return ((a[0]-b[0])**2+(a[1]-b[1])**2)**0.5
+def compute_city_distance_coordinates(a, b):
+    return ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5
 
 
 def compute_city_distance_names(city_a, city_b, cities_dict):
@@ -34,7 +35,7 @@ def generate_distances():
 def genesis(city_list, n_population):
     population_set = []
     for i in range(n_population):
-        #Randomly generating a new solution
+        # Randomly generating a new solution
         sol_i = city_list[np.random.choice(list(range(NOMBRE_DE_VILLES)), NOMBRE_DE_VILLES, replace=False)]
         population_set.append(sol_i)
     return np.array(population_set)
@@ -42,17 +43,17 @@ def genesis(city_list, n_population):
 
 def get_fitness(city_list, distance_list):
     total = 0
-    for i in range(NOMBRE_DE_VILLES-1):
+    for i in range(NOMBRE_DE_VILLES - 1):
         a = city_list[i]
-        b = city_list[i+1]
+        b = city_list[i + 1]
         total += distance_list[a][b]
     return total
 
 
 def get_all_fitness(population_set, distance_list):
     fitnes_list = np.zeros(n_population)
-    #Looping over all solutions computing the fitness for each solution
-    for i in  range(n_population):
+    # Looping over all solutions computing the fitness for each solution
+    for i in range(n_population):
         fitnes_list[i] = get_fitness(population_set[i], distance_list)
     return fitnes_list
 
@@ -62,8 +63,10 @@ def progenitor_selection(population_set, fitnes_list):
     prob_list = fitnes_list / total_fit
 
     # Notice there is the chance that a progenitor. mates with oneself
-    progenitor_list_a = np.random.choice(list(range(len(population_set))), len(population_set), p=prob_list, replace=True)
-    progenitor_list_b = np.random.choice(list(range(len(population_set))), len(population_set), p=prob_list, replace=True)
+    progenitor_list_a = np.random.choice(list(range(len(population_set))), len(population_set), p=prob_list,
+                                         replace=True)
+    progenitor_list_b = np.random.choice(list(range(len(population_set))), len(population_set), p=prob_list,
+                                         replace=True)
     progenitor_list_a = population_set[progenitor_list_a]
     progenitor_list_b = population_set[progenitor_list_b]
     return np.array([progenitor_list_a, progenitor_list_b])
@@ -140,7 +143,7 @@ def main():
 
         mutated_pop = mutate_population(new_population_set)
 
-    print("voici la solution final :",best_solution)
+    print("voici la solution final :", best_solution)
 
 
 if __name__ == '__main__':
