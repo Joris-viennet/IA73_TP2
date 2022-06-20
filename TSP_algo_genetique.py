@@ -8,6 +8,7 @@ NOMBRE_DE_VILLES = 10
 MAX_DISTANCE = 2000
 n_population = 100
 mutation_rate = 0.3
+NB_GENERATION = 100
 
 
 # Function to compute the distance between two points
@@ -124,7 +125,7 @@ def main():
     print('voici la liste des enfants mutés \n', mutated_pop)
 
     best_solution = [-1, np.inf, np.array([])]
-    for i in range(10000):
+    for i in range(NB_GENERATION):
         # if i % 100 == 0: print(i, fitnes_list.min(), fitnes_list.mean(), datetime.now().strftime("%d/%m/%y %H:%M"))
         fitnes_list = get_all_fitness(mutated_pop, distances_list)
 

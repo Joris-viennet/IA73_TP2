@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 
 # Données du problème (générées aléatoirement)
 NOMBRE_DE_VILLES = 10
+NB_GENERATION = 100
 distances = np.zeros((NOMBRE_DE_VILLES, NOMBRE_DE_VILLES))
 MAX_DISTANCE=2000
 for ville in range(NOMBRE_DE_VILLES):
@@ -51,7 +52,7 @@ T_intiale=MAX_DISTANCE/2
 min_sol=solution
 cout_min_sol=cout0
 historique_cout = []
-for i in range(100):
+for i in range(NB_GENERATION):
     historique_cout.append(cout0)
     print('la ',i,'ème solution = ',solution,' distance totale= ',cout0,' température actuelle =',T)
     T=T*facteur
