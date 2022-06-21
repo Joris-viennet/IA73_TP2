@@ -8,11 +8,11 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 # Parameters
-NOMBRE_DE_VILLES = 10
+NOMBRE_DE_VILLES = 100
 MAX_DISTANCE = 2000
 n_population = 100
-mutation_rate = 0.3
-NB_GENERATION = 100
+mutation_rate = 0.9
+NB_GENERATION = 1000
 
 
 # Function to compute the distance between two points
@@ -49,20 +49,19 @@ def genesis(city_list, n_population):
     return np.array(population_set)
 
 
-def get_fitness(city_list, distance_list):
-    total = 0
-    for i in range(NOMBRE_DE_VILLES - 1):
-        a = city_list[i]
-        b = city_list[i + 1]
-        total += distance_list[a][b]
-    return total
+def cal_distance(solution, distances, NOMBRE_DE_VILLES):
+    eval_distance = 0
+    for i in range(len(solution)):
+        origine, destination = solution[i], solution[(i + 1) % NOMBRE_DE_VILLES]
+        eval_distance += distances[origine][destination]
+    return eval_distance
 
 
 def get_all_fitness(population_set, distance_list):
     fitnes_list = np.zeros(n_population)
     # Looping over all solutions computing the fitness for each solution
     for i in range(n_population):
-        fitnes_list[i] = get_fitness(population_set[i], distance_list)
+        fitnes_list[i] = cal_distance(population_set[i], distance_list, NOMBRE_DE_VILLES)
     return fitnes_list
 
 
@@ -147,7 +146,7 @@ def main():
         if fitnes_list.min() < best_solution[1]:
             best_solution[0] = i
             best_solution[1] = fitnes_list.min()
-            best_solution[2] = np.array(mutated_pop)[fitnes_list.min() == fitnes_list]
+            best_solution[2] = np.array(mutated_pop)[fitnes_list.min() == fitnes_list][0]
         historique_cout.append(best_solution[1])
         progenitor_list = progenitor_selection(population_set, fitnes_list)
         new_population_set = mate_population(progenitor_list)
@@ -156,12 +155,13 @@ def main():
 
     print("voici la solution final :", best_solution)
 
+    plt.figure(figsize=(7, 4))
     plt.plot(list(range(NB_GENERATION)), historique_cout, label='Valeur maximale')
     plt.legend()
     plt.title('Evolution du coût à travers les générations')
     plt.xlabel('Nbr de générations')
     plt.ylabel('Coût')
-    plt.show()
+    plt.savefig(f"genetique_{NB_GENERATION}.png")
 
 
 if __name__ == '__main__':

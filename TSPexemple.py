@@ -13,8 +13,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Données du problème (générées aléatoirement)
-NOMBRE_DE_VILLES = 10
-NB_GENERATION = 100
+NOMBRE_DE_VILLES = 100
+NB_GENERATION = 1000
 MAX_DISTANCE = 2000
 
 
@@ -39,8 +39,8 @@ def import_data():
     return np.array(distances)
 
 
-distances = generate_distances()
-export_data(distances)
+# distances = generate_distances()
+# export_data(distances)
 distances = import_data()
 print('voici la matrice des distances entres les villes \n', distances)
 
@@ -73,7 +73,7 @@ for i in range(NB_GENERATION):
     historique_cout.append(cout0)
     print('la ', i, 'ème solution = ', solution, ' distance totale= ', cout0, ' température actuelle =', T)
     T = T * facteur
-    for j in range(50):
+    for j in range(NB_GENERATION // 2):
         nouv_sol = voisinage(solution * 1, NOMBRE_DE_VILLES)
         cout1 = cal_distance(nouv_sol, distances, NOMBRE_DE_VILLES)
         if cout1 < cout0:
@@ -90,9 +90,10 @@ for i in range(NB_GENERATION):
 
 print('voici la solution retenue ', min_sol, ' et son coût ', cal_distance(min_sol, distances, NOMBRE_DE_VILLES))
 
+plt.figure(figsize=(7, 4))
 plt.plot(list(range(NB_GENERATION)), historique_cout, label='Valeur maximale')
 plt.legend()
 plt.title('Evolution du coût à travers les générations')
 plt.xlabel('Nbr de générations')
 plt.ylabel('Coût')
-plt.show()
+plt.savefig(f"recuit_{NB_GENERATION}.png")
